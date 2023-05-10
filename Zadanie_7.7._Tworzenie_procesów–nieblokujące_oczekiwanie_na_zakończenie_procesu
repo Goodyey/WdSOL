@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# uruchom program w tle
+./nazwa_programu &
+
+# zapisz PID procesu rodzica
+parent_pid=$!
+
+# wyświetl identyfikatory procesów
+echo "PID procesu rodzica: $$"
+echo "PID procesu potomka: $!"
+echo "PID procesu nadrzędnego: $PPID"
+
+# stwórz proces osierocony
+if [ $PPID -ne 1 ]
+then
+    (sleep 5; echo "Rodzic skończył działanie"; ps -o pid,ppid,state,command | grep $$) &
+else
+    echo "Nie można utworzyć procesu osieroconego"
+fi
+
+# czekaj na zakończenie procesu potomnego
+while ps -p $! >/dev/null
+do
+    echo "Oczekiwanie na zakończenie procesu potomnego..."
+    sleep 1
+done
+
+# wyświetl identyfikator zakończonego procesu
+echo "Proces potomka zakończony z kodem: $?"
+
+# wyświetl komunikat przed zakończeniem działania procesu rodzica
+echo "Proces rodzica kończy działanie"; ps -o pid,ppid,state,command | grep $parent_pid
