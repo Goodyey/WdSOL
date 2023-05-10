@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# uruchom program w tle
+./nazwa_programu &
+
+# zapisz PID procesu rodzica
+parent_pid=$!
+
+# wypisz informacje o procesach rodzica i potomka co sekundę
+while true
+do
+    clear # wyczyść ekran
+    echo "Procesy rodzica i potomka:"
+    ps f -p $parent_pid # wyświetl informacje o procesie rodzica
+    ps f --ppid $parent_pid # wyświetl informacje o procesie potomka
+    sleep 1 # poczekaj sekundę
+done

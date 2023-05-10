@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# obsługa sygnału SIGCHLD
+trap "echo 'Proces potomka zakończony'; ps -o pid,ppid,state,command | grep $$; exit" SIGCHLD
+
+# uruchom program w tle
+./nazwa_programu &
+
+# zapisz PID procesu rodzica
+parent_pid=$!
+
+# wyświetl identyfikatory procesów
+echo "PID procesu rodzica: $$"
+echo "PID procesu potomka: $!"
+echo "PID procesu nadrzędnego: $PPID"
+
+# stwórz proces osierocony
+if [ $PPID -ne 1 ]
+then
+    (sleep 5; echo "Rodzic skończył działanie"; ps -o pid,ppid,state,command | grep $$) &
+else
+    echo "Nie można utworzyć procesu osieroconego"
+fi
+
+# wypisz informacje o procesach rodzica i potomka co sekundę
+while true
+do
+    clear # wyczyść ekran
+    echo "Procesy rodzica i potomka:"
+    ps f -p $parent_pid # wyświetl informacje o procesie rodzica
+    ps f --ppid $parent_pid # wyświetl informacje o procesie potomka
+    sleep 1 # poczekaj sekundę
+done
+
+# wyświetl komunikat przed zakończeniem działania procesu rodzica
+echo "Proces rodzica kończy działanie"; ps -o pid,ppid,state,command | grep $parent_pid
+
+# wyświetl komunikat przed zakończeniem działania procesu potomka
+echo "Proces potomka kończy działanie"
+exit
